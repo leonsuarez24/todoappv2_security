@@ -1,0 +1,17 @@
+<div class="container" *ngIf="task">
+  <div class="row mt-5">
+    <div class="col-md-4 mx-auto">
+      <div class="card">
+        <div class="card-header text-center">
+          <i class="fa-solid fa-thumbtack w-100"> {{ task.name }}</i>
+        </div>
+        <div class="card-body">{{ task.content }}</div>
+        <div class="card-footer">
+          <button class="btn btn-outline-primary w-100" routerLink="/">
+            <i class="fa-solid fa-circle-left"> Back</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

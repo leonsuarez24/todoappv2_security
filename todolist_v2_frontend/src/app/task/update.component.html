@@ -1,0 +1,46 @@
+<div class="container" *ngIf="task">
+  <div class="row mt-5">
+    <div class="col-md-4 mx-auto">
+      <form (ngSubmit)="onUpdate()" #f="ngForm">
+        <div class="mb-3">
+          <label for="title" class="form-label"
+            ><i class="fa-solid fa-thumbtack"> Edit Task Title</i></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            placeholder="Task Title"
+            required
+            name="name"
+            [(ngModel)]="task.name"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="content" class="form-label">
+            <i class="fa-solid fa-pencil"> Edit Content</i>
+          </label>
+          <textarea
+            class="form-control"
+            id="content"
+            rows="3"
+            required
+            name="content"
+            [(ngModel)]="task.content"
+          ></textarea>
+        </div>
+        <div class="container d-flex justify-content-center">
+          <button
+            class="btn btn-outline-success w-50 me-3"
+            [disabled]="!f.valid"
+          >
+            <i class="fa-solid fa-circle-plus"> Edit</i>
+          </button>
+          <button class="btn btn-outline-primary w-50" routerLink="/">
+            <i class="fa-solid fa-circle-left"> Back</i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
