@@ -8,16 +8,23 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.leon.todoapp.jose.Jwks;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -28,13 +35,39 @@ public class SecurityConfig {
     private RSAKey rsaKey;
 
     @Bean
-    InMemoryUserDetailsManager user(){
-        return new InMemoryUserDetailsManager(
-                User.withUsername("User")
-                        .password("{noop}password")
-                        .authorities("read")
-                        .build()
-        );
+    public UserDetailsService users(){
+        UserDetails user = User.builder()
+                .username("user")
+                .password(passwordEncoder().encode("password"))
+                .roles("USER")
+                .build();
+
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder().encode("password"))
+                .roles("USER", "ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(user, admin);
+    }
+
+    @Bean
+    BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Bean
+    SecurityFilterChain tokenSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher("/token")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/token").permitAll())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(csrf-> csrf.disable())
+                .httpBasic(Customizer.withDefaults())
+                .build();
     }
 
     @Bean
@@ -43,12 +76,12 @@ public class SecurityConfig {
                 .csrf( csrf -> csrf.disable() )
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/token").permitAll()
+                                .requestMatchers("/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .requestMatchers("/admin").hasAnyAuthority("ROLE_ADMIN")
                                 .anyRequest().authenticated())
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(Customizer.withDefaults())
                 .build();
     }
 
@@ -67,5 +100,16 @@ public class SecurityConfig {
     @Bean
     JwtDecoder jwtDecoder() throws JOSEException {
         return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter(){
+        final JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        final JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
     }
 }
