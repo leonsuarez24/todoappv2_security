@@ -6,10 +6,15 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.leon.todoapp.jose.Jwks;
+import org.leon.todoapp.service.impl.MyUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,22 +39,8 @@ public class SecurityConfig {
 
     private RSAKey rsaKey;
 
-    @Bean
-    public UserDetailsService users(){
-        UserDetails user = User.builder()
-                .username("user")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER")
-                .build();
-
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER", "ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
-    }
+    @Autowired
+    private MyUserDetailsService myUserDetailsService;
 
     @Bean
     BCryptPasswordEncoder passwordEncoder() {
@@ -111,5 +102,21 @@ public class SecurityConfig {
         final JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
+    }
+
+    @Bean
+    ApplicationListener<AuthenticationSuccessEvent> successEvent() {
+        return event -> {
+            System.out.println("Success login " + event.getAuthentication().getClass().getSimpleName() + " " +
+                    event.getAuthentication().getName());
+        };
+    }
+
+    @Bean
+    ApplicationListener<AuthenticationFailureBadCredentialsEvent> failureEvent() {
+        return event -> {
+            System.out.println("Bad credentials " + event.getAuthentication().getClass().getSimpleName() + " " +
+                    event.getAuthentication().getName());
+        };
     }
 }
