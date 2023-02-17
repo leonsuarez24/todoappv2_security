@@ -1,5 +1,6 @@
 package org.leon.todoapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -15,13 +16,27 @@ public class ToDoList {
     @NotBlank(message = "task content is mandatory")
     private String content;
 
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "users_id")
+    @JsonIgnore
+    private Users users;
+
     public ToDoList() {
     }
 
-    public ToDoList(Long id, String name, String content) {
+    public ToDoList(Long id, String name, String content, Users users) {
         this.id = id;
         this.name = name;
         this.content = content;
+        this.users = users;
+    }
+
+    public Users getUsers() {
+        return users;
+    }
+
+    public void setUsers(Users users) {
+        this.users = users;
     }
 
     public Long getId() {
