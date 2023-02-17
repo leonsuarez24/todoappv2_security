@@ -3,6 +3,7 @@ package org.leon.todoapp.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.lang.NonNull;
 
 import java.util.Set;
@@ -17,14 +18,17 @@ public class Users {
 
     @NonNull
     @Column(unique = true)
+    @NotBlank(message = "Username is mandatory")
     private String username;
 
     @NonNull
     @Column(unique = true)
     @Email
+    @NotBlank(message = "Email is mandatory")
     private String email;
 
     @NonNull
+    @NotBlank(message = "Password is mandatory")
     private String password;
 
 

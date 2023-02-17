@@ -1,11 +1,17 @@
 package org.leon.todoapp.controller;
 
+import jakarta.validation.Valid;
 import org.leon.todoapp.dto.LoginRequest;
+import org.leon.todoapp.dto.MessageDto;
+import org.leon.todoapp.entity.Users;
+import org.leon.todoapp.exceptions.AttributeException;
+import org.leon.todoapp.service.UsersService;
 import org.leon.todoapp.service.impl.TokenService;
 import org.slf4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.LoggerFactory;
@@ -17,6 +23,7 @@ public class AuthController {
     private static final Logger LOG = (Logger) LoggerFactory.getLogger(AuthController.class);
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
+
 
     public AuthController(TokenService tokenService, AuthenticationManager authenticationManager) {
         this.tokenService = tokenService;
@@ -33,4 +40,6 @@ public class AuthController {
         LOG.debug("Token: {}", token);
         return token;
     }
+
+
 }
