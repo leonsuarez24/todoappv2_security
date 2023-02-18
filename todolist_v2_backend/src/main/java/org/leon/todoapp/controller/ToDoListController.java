@@ -29,6 +29,11 @@ public class ToDoListController {
         return new ResponseEntity<>(toDoListService.getAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<List<ToDoList>> findAllByUsersId(@PathVariable(name = "id") Long usersId){
+        return new ResponseEntity<>(toDoListService.findAllByUsersId(usersId), HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ToDoList> getOne(@PathVariable(name = "id") Long id) throws ResourceNotFoundException {
         return new ResponseEntity<>(toDoListService.getOne(id), HttpStatus.OK);

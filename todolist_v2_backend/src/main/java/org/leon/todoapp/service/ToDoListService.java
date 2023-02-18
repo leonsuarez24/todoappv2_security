@@ -14,4 +14,5 @@ public interface ToDoListService {
     ToDoList save(ToDoList toDoList) throws AttributeException;
     ToDoList update(Long id, ToDoListDto toDoListDto) throws ResourceNotFoundException, AttributeException;
     ToDoList delete(Long id) throws ResourceNotFoundException;
+    List<ToDoList> findAllByUsersId (Long usersId);
 }
