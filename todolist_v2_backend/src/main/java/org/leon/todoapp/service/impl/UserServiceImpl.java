@@ -1,5 +1,6 @@
 package org.leon.todoapp.service.impl;
 
+import org.leon.todoapp.entity.Authorities;
 import org.leon.todoapp.entity.Users;
 import org.leon.todoapp.exceptions.AttributeException;
 import org.leon.todoapp.repository.UsersRepository;
@@ -7,7 +8,9 @@ import org.leon.todoapp.service.UsersService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UsersService {
