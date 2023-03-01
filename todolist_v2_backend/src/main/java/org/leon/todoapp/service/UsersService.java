@@ -13,4 +13,5 @@ public interface UsersService {
 
     public Users create( Users user) throws AttributeException;
     public List<Users> getAll();
+    Users findById(Long id) throws AttributeException;
 }

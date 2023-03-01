@@ -33,9 +33,9 @@ public class ToDoListServiceImpl implements ToDoListService {
 
     @Override
     public ToDoList save(ToDoList toDoList) throws AttributeException {
-        if (toDoListRepository.existsByName(toDoList.getName())){
+        /*if (toDoListRepository.existsByName(toDoList.getName())){
             throw new AttributeException("The task name " + toDoList.getName() + " is already in the list");
-        }
+        }*/
         return toDoListRepository.save(toDoList);
     }
 
@@ -43,9 +43,9 @@ public class ToDoListServiceImpl implements ToDoListService {
     public ToDoList update(Long id, ToDoListDto toDoListDto) throws ResourceNotFoundException, AttributeException {
         ToDoList toDoList = toDoListRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not found"));
 
-        if (toDoListRepository.existsByName(toDoListDto.name()) && !toDoListRepository.findByName(toDoListDto.name()).get().getId().equals(id)){
+        /* if (toDoListRepository.existsByName(toDoListDto.name()) && !toDoListRepository.findByName(toDoListDto.name()).get().getId().equals(id)){
             throw new AttributeException("The task name " + toDoListDto.name() + " is already in the list");
-        }
+         } */
 
         toDoList.setName(toDoListDto.name());
         toDoList.setContent(toDoListDto.content());

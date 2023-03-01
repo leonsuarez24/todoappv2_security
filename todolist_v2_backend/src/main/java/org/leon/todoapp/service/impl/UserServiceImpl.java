@@ -5,11 +5,13 @@ import org.leon.todoapp.entity.Users;
 import org.leon.todoapp.exceptions.AttributeException;
 import org.leon.todoapp.repository.UsersRepository;
 import org.leon.todoapp.service.UsersService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -39,5 +41,14 @@ public class UserServiceImpl implements UsersService {
     @Override
     public List<Users> getAll() {
         return usersRepository.findAll();
+    }
+
+    @Override
+    public Users findById(Long id) throws AttributeException {
+        Optional<Users> usersOptional = usersRepository.findById(id);
+        if (usersOptional.isPresent()){
+            return usersOptional.get();
+        }
+        throw new AttributeException("User don't exist");
     }
 }
